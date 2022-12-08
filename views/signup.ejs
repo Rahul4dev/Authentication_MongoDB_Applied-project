@@ -1,0 +1,40 @@
+<%- include('includes/head.ejs', { title: 'Signup' }) %>
+  <link rel="stylesheet" href="/styles/forms.css">
+  <link rel="stylesheet" href="/styles/auth.css">
+</head>
+
+<body>
+  <%- include('includes/header.ejs') %>
+  <main id="signup">
+    <h1>Signup</h1>
+    <% if (inputData.hasError) { %> 
+      <p id="input-error"><%= inputData.message %> </p>
+      <% } %> 
+    <form action="/signup" method="POST">
+      <!-- POST request will be handled on the routes in the demo.js, will takes the action to send the request to /signup http request -->
+      <div class="form-control">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" value="<%= inputData.email %> " required>
+      </div>
+      <!-- input fields' attributes will be used to extract data in the demo.js file for the routes to fetch and save the data in the server.  -->
+      <!-- type attribute will consider the type of input the element is getting, it is in-built with its values, 
+        as email type will ensure that input must have @ and in mobile view it will also open appropriate keyboard to enter these fields,
+      similarly, for password type input, the field will get masked and the input character are show as identical dots, so that nobody can see your input password, -->
+      <div class="form-control">
+        <label for="confirm-email">Confirm Email</label>
+        <input type="email" id="confirm-email" name="confirm-email" value="<%= inputData.confirmEmail %> "  required>
+        
+      </div>
+      <div class="form-control">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" value="<%= inputData.password %> "  required>
+      </div>
+      <button class="btn">Create user</button>
+    </form>
+    <div id="auth-alternative">
+      <a class="btn btn-alt" href="/login">Login instead</a>
+    </div>
+  </main>
+</body>
+
+</html>
