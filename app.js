@@ -43,6 +43,31 @@ app.use(
   })
 );
 
+// step 8: Our own custom middleware to customize UX/UI for users and Admin
+// position of this MW is imp, as it require session data, express les.local property, its data will be used in ejs templates etc, hence it came after those MW.
+// Most Imp, the position of this MW also deliberately fixed before the main_route of the program i.e, the demoRoute.
+app.use(async function (req, res, next) {
+  const user = req.session.user;
+  const isAuth = req.session.isAuthenticated;
+
+  // validation check
+  if (!user || !isAuth) {
+    return next(); // return to next middleware
+  }
+  const userDoc = await db
+    .getDb()
+    .collection("users")
+    .findOne({ _id: user.id });
+  const isAdmin = userDoc.isAdmin;
+
+  // res.locals property is an object that contains response local variables scoped to the request and because of this it is only available to the views (folder templates) rendered during that request/response cycle.
+  res.locals.isAuth = isAuth;
+  res.locals.isAdmin = isAdmin;
+  // isAuth(L) is the key which we can use in the templates, the key contains the values(boolean), hence used for modification of Nav-Bar.
+  next();
+});
+
+// this is our main route which handle the demo route.
 app.use(demoRoutes);
 
 app.use(function (error, req, res, next) {
