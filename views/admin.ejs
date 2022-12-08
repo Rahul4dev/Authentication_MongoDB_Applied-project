@@ -1,0 +1,13 @@
+<%- include('includes/head.ejs', { title: 'Admin' }) %>
+</head>
+<!-- Only Admin will get access to this page -->
+<body>
+  <%- include('includes/header.ejs') %>
+  <main>
+    <h1>The Admin Page</h1>
+    <p>You should only get here, if you're Administrator of this Website.</p>
+    <p>Typically, admin pages like this would allow you to create and edit data (e.g. blog posts) 
+      or do similar tasks that should not be available to every user!</p>
+  </main>
+</body>
+</html>
