@@ -33,7 +33,19 @@ router.get("/signup", function (req, res) {
 });
 
 router.get("/login", function (req, res) {
-  res.render("login");
+  let sessionInputData = req.session.inputData;
+
+  if (!sessionInputData) {
+    // first time signup
+    sessionInputData = {
+      hasError: false,
+      email: "",
+      password: "",
+    };
+  }
+
+  req.session.inputData = null;
+  res.render("login", { inputData: sessionInputData });
 });
 
 // Step 1, the signUp process, here we create the user account by getting the  input of email and password. signup template we have build in views folder, where we can see the credentials we get from the POST request, which ultimately we use here to resolve the request.
@@ -89,10 +101,19 @@ router.post("/signup", async function (req, res) {
 
   // if we do find one existing email address
   if (existingUser) {
-    console.log(
-      "User exist already, use another email or sign in with existing email address"
-    );
-    return res.redirect("/signup");
+    req.session.inputData = {
+      hasError: true,
+      message:
+        "User exist already, use another email or sign in with existing email address",
+      email: enteredEmail,
+      confirmEmail: enteredConfirmEmail,
+      password: enteredPassword,
+    };
+    // step 8: More UX/UI, same step here to save the wrong input and redirect to signup for correction.
+    req.session.save(function () {
+      return res.redirect("/signup");
+    });
+    return;
   }
 
   // we can't store the password as plain text for potential threats, we have to hash them, i.e, we change them into a non-readable form, which can't be decoded. for that we need bcrypt.js package.    In terminal:  npm install bcryptjs
@@ -128,8 +149,16 @@ router.post("/login", async function (req, res) {
   // since email validation is easy and fast, if the email matched from the database, it will send the data related to that email, which ultimately confirms that the user do exist in the database. here we are not checking any typo made by the user. it will be tackled later in the error handling step.
 
   if (!existingUser) {
-    console.log("user could not logged in");
-    return res.redirect("/login");
+    req.session.inputData = {
+      hasError: true,
+      message: "Could not logged you in - Please check your credentials!",
+      email: enteredEmail,
+      password: enteredPassword,
+    };
+    req.session.save(function () {
+      return res.redirect("/login");
+    });
+    return;
   }
   // when it checks the if statement and passes, then we have to check the enteredPassword also match with that user password. So we have to change the new enteredPassword into hashPassword and then check if it matches or not, as the same algo on the same password will create same hash_code.
 
@@ -140,8 +169,16 @@ router.post("/login", async function (req, res) {
 
   // then we check if the boolean we receive is true or false, if not..
   if (!passwordAreEqual) {
-    console.log("user could not logged in - check password again");
-    return res.redirect("/login");
+    req.session.inputData = {
+      hasError: true,
+      message: "Could not logged you in - Please check your credentials!",
+      email: enteredEmail,
+      password: enteredPassword,
+    };
+    req.session.save(function () {
+      return res.redirect("/login");
+    });
+    return;
   }
   // if GEC makes upto this line it means, both email and password is correct. hence we can grant the user to enter in the protective resources. and we can show personalized content for the user through cookies and sessions. which comes in next step.
 
