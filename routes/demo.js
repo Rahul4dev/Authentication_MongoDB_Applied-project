@@ -207,18 +207,20 @@ router.post("/login", async function (req, res) {
 router.get("/admin", async function (req, res) {
   // check the user session 'ticket', for the authentication.
 
-  if (!req.session.isAuthenticated) {
+  // more step 8: if-checks for auth and admin
+  if (!res.locals.isAuth) {
+    // (!req.session.isAuthenticated) not req, now we use res.locals.isAuth to validate.
     // or if (!req.session.user)
     return res.status(401).render("401"); // user Not Authenticated
   }
 
   // step 7: validating the Authorization through isAdmin value
-  const user = await db
-    .getDb()
-    .collection("users")
-    .findOne({ _id: req.session.user.id });
+  //const user = await db
+  // .getDb()
+  // .collection("users")
+  // .findOne({ _id: req.session.user.id });  // since we got this data from res.locals now
 
-  if (!user || !user.isAdmin) {
+  if (!res.locals.isAdmin) {
     return res.status(403).render("403");
   }
 
@@ -229,7 +231,8 @@ router.get("/admin", async function (req, res) {
 router.get("/profile", function (req, res) {
   // check the user session 'ticket', for the authentication.
 
-  if (!req.session.isAuthenticated) {
+  if (!res.locals.isAuth) {
+    // (!req.session.isAuthenticated)
     // or if (!req.session.user)
     return res.status(401).render("401"); // user Not Authenticated
   }
